@@ -13,7 +13,7 @@
 #include <csp/csp.h>
 #include <vmem/vmem.h>
 
-#define VMEM_SERVER_TIMEOUT 30000
+#define VMEM_SERVER_TIMEOUT 3000
 #define VMEM_SERVER_MTU 192
 #define VMEM_PORT_SERVER 14
 #define VMEM_VERSION 3
@@ -99,6 +99,8 @@ typedef struct vmem_handler_obj_s {
 
 void vmem_server_handler(csp_conn_t * conn);
 void vmem_server_loop(void * param);
+/* Export rparam_list_handler for Zephyr apps that handle ports manually */
+void rparam_list_handler(csp_conn_t * conn);
 
 /**
  * @brief Register a handler for a specific VMEM request type

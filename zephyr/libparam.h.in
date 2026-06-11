@@ -1,0 +1,23 @@
+/*
+ * libparam.h - Auto-generated configuration header for Zephyr
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#ifndef LIBPARAM_H_
+#define LIBPARAM_H_
+
+/* Parameter system configuration */
+#cmakedefine PARAM_HAVE_SYS_QUEUE
+#cmakedefine PARAM_LIST_DYNAMIC
+#define PARAM_LIST_POOL ${PARAM_LIST_POOL}
+#cmakedefine PARAM_HAVE_TIMESTAMP
+
+/* VMEM 64-bit API support */
+#define PARAM_VMEM_64_BITS_API ${PARAM_VMEM_64_BITS_API}
+
+/* MessagePack configuration */
+#define MPACK_FLOAT ${MPACK_FLOAT}
+#define MPACK_STDIO ${MPACK_STDIO}
+
+#endif /* LIBPARAM_H_ */

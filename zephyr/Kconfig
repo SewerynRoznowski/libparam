@@ -1,0 +1,69 @@
+# libparam - Space Inventor Parameter System
+
+# SPDX-License-Identifier: MIT
+
+config LIBPARAM
+	bool "Enable Space Inventor Parameter System Support"
+	depends on LIBCSP
+	help
+	  This option enables the libparam library for managing
+	  configuration and telemetry parameters over CSP.
+
+if LIBPARAM
+
+module = LIBPARAM
+module-str = libparam
+source "subsys/logging/Kconfig.template.log_config"
+
+config APP_LINK_WITH_LIBPARAM
+	bool "Link 'app' with libparam"
+	default y
+	help
+	  Add libparam header files to the 'app' include path.
+
+config PARAM_LIST_DYNAMIC
+	bool "Dynamic parameter list support"
+	default n
+	help
+	  Compile support for dynamic param list (requires dynamic memory allocation).
+	  For embedded systems, it's recommended to keep this disabled.
+
+config PARAM_LIST_POOL
+	int "Pre-allocated parameter list pool size"
+	default 0
+	help
+	  Compile support for pre-allocated param list pool.
+	  Set to 0 to disable. Requires sys/queue.h support.
+
+config PARAM_HAVE_TIMESTAMP
+	bool "Parameter timestamping support"
+	default n
+	help
+	  Enable parameter timestamping feature. Requires CSP timestamp support.
+
+config PARAM_HAVE_FOPEN
+	bool "POSIX fopen support"
+	default n
+	help
+	  Enable POSIX fopen for file-based VMEM operations.
+	  Only enable if your platform supports fopen.
+
+config PARAM_HAVE_FLOAT
+	bool "Float/Double support"
+	default y
+	help
+	  Enable support for float and double parameter types.
+
+config PARAM_VMEM_FRAM
+	bool "VMEM FRAM support"
+	default n
+	help
+	  Enable support for FRAM (Ferroelectric RAM) virtual memory backend.
+
+config PARAM_COLLECTOR
+	bool "Parameter collector support"
+	default n
+	help
+	  Enable parameter collector functionality.
+
+endif # LIBPARAM

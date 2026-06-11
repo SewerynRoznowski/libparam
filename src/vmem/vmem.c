@@ -125,7 +125,7 @@ vmem_t * vmem_vaddr_to_vmem(uint64_t vaddr) {
 		vmem = vmem_from_iter(iter);
 
 		/* Find VMEM from vaddr */
-		if ((vaddr >= vmem->vaddr) && (vaddr <= vmem->vaddr + vmem->size)) {
+		if ((vaddr >= vmem->vaddr) && (vaddr < vmem->vaddr + vmem->size)) {
 			return vmem;
 		}
 	}

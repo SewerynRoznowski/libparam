@@ -23,6 +23,12 @@
 #include <libparam.h>
 #include <param/param_server.h>
 #include "vmem_internal.h"
+#include <zephyr/logging/log.h>
+
+/* Include CSP internal header for connection struct access */
+#include "../../../libcsp/src/csp_conn.h"
+
+LOG_MODULE_REGISTER(vmem_server, LOG_LEVEL_DBG);
 
 /* Statically allocate a listener socket */
 static csp_socket_t vmem_server_socket = {0};
@@ -80,12 +86,17 @@ void vmem_server_handler(csp_conn_t * conn)
 {
 	/* Read request */
 	csp_packet_t * packet = csp_read(conn, VMEM_SERVER_TIMEOUT);
-	if (packet == NULL)
+	if (packet == NULL) {
+		LOG_WRN("VMEM server: timeout reading request");
 		return;
+	}
 
 	/* Copy data from request */
 	vmem_request_t * request = (void *) packet->data;
 	int type = request->type;
+	
+	LOG_DBG("VMEM server: request type=%d version=%d", type, request->version);
+
 
 	/**
 	 * DOWNLOAD
@@ -176,9 +187,18 @@ void vmem_server_handler(csp_conn_t * conn)
 
 			csp_buffer_free(packet);
 		}
+		
+		LOG_DBG("VMEM server: UPLOAD complete, %u bytes written", count);
+		
 		// Now flush the VMEM cache associated with the address, if any
 		vmem_t *vmem = vmem_vaddr_to_vmem(address);
+		if (vmem) {
+			LOG_INF("VMEM server: flushing vmem '%s'", vmem->name);
+		} else {
+			LOG_INF("VMEM server: flushing vmem NULL");
+		}
 		(void)vmem_flush(vmem);
+		LOG_INF("VMEM server: flush complete");
 
 	} else if (request->type == VMEM_SERVER_LIST) {
 
@@ -293,7 +313,8 @@ void vmem_server_handler(csp_conn_t * conn)
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
-static void rparam_list_handler(csp_conn_t * conn)
+/* Made non-static so Zephyr applications can call it directly when handling ports manually */
+void rparam_list_handler(csp_conn_t * conn)
 {
 	const param_t * param;
 	param_list_iterator i = {0};
@@ -355,6 +376,8 @@ void vmem_server_loop(void * param) {
 		/* Wait for connection, 10000 ms timeout */
 		if ((conn = csp_accept(&vmem_server_socket, CSP_MAX_DELAY)) == NULL)
 			continue;
+
+		LOG_DBG("VMEM server: connection accepted");
 
 		/* Handle RDP service differently */
 		if (csp_conn_dport(conn) == VMEM_PORT_SERVER) {
